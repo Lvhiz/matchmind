@@ -45,7 +45,6 @@ export function MarketCard({ market }: Props) {
         <style>{`
           @keyframes slideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
           @keyframes borderFlash { 0% { opacity: 1; } 100% { opacity: 0; } }
-          @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-2px); } 75% { transform: translateX(2px); } }
         `}</style>
 
         {statusOverlay ? (
@@ -57,7 +56,7 @@ export function MarketCard({ market }: Props) {
 
         <div className="mb-3 flex items-start justify-between gap-4">
           <div className="text-xl font-bold text-white">{market.question}</div>
-          <div className={`shrink-0 text-right text-lg font-semibold ${closing ? "animate-[shake_0.6s_infinite] text-red-400" : critical ? "animate-pulse text-red-400" : urgent ? "text-orange-400" : "text-white"}`}>
+          <div className={`shrink-0 text-right text-lg font-semibold ${closing ? "animate-closing-shake text-red-400" : critical ? "animate-pulse text-red-400" : urgent ? "text-orange-400" : "text-white"}`}>
             {timerText}
           </div>
         </div>

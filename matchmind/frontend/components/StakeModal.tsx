@@ -33,7 +33,7 @@ export function StakeModal({ market, side, onClose }: Props) {
       return amount;
     }
 
-    const est = Number(amount) * Number(totalPool) / Number(sidePool);
+    const est = (Number(amount) * Number(totalPool)) / Number(sidePool);
     return Number.isFinite(est) ? est.toFixed(2) : amount;
   }, [amount, sidePool, stakeAmount, totalPool]);
 
@@ -45,6 +45,7 @@ export function StakeModal({ market, side, onClose }: Props) {
 
   const submit = async () => {
     setErrorMessage(null);
+
     try {
       if (!approved) {
         await approveUSDT(market.address, stakeAmount);
@@ -80,7 +81,7 @@ export function StakeModal({ market, side, onClose }: Props) {
           onClick={onClose}
           className="absolute right-3 top-3 rounded-md p-2 text-neutral-400 hover:bg-white/5 hover:text-white"
         >
-          ✕
+          ×
         </button>
 
         <div className="mb-4">
@@ -124,7 +125,7 @@ export function StakeModal({ market, side, onClose }: Props) {
           disabled={isApproving || isStaking}
           className="mt-6 flex h-14 w-full items-center justify-center rounded-md bg-white px-4 text-sm font-semibold text-black transition hover:bg-neutral-200 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {(isApproving || isStaking) ? <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-black/30 border-t-black" /> : null}
+          {isApproving || isStaking ? <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-black/30 border-t-black" /> : null}
           {isApproving
             ? "Approving..."
             : isStaking
