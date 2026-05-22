@@ -1,0 +1,23 @@
+[
+  {
+    "type": "event",
+    "name": "MarketResolved",
+    "inputs": [
+      { "name": "market", "type": "address", "indexed": true },
+      { "name": "outcome", "type": "bool", "indexed": false },
+      { "name": "timestamp", "type": "uint256", "indexed": false }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "function",
+    "name": "resolveMarket",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      { "name": "market", "type": "address" },
+      { "name": "outcome", "type": "bool" },
+      { "name": "signature", "type": "bytes" }
+    ],
+    "outputs": []
+  }
+]

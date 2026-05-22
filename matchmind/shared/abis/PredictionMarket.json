@@ -1,0 +1,83 @@
+[
+  {
+    "type": "event",
+    "name": "Staked",
+    "inputs": [
+      { "name": "user", "type": "address", "indexed": true },
+      { "name": "side", "type": "bool", "indexed": false },
+      { "name": "amount", "type": "uint256", "indexed": false }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "Resolved",
+    "inputs": [{ "name": "outcome", "type": "bool", "indexed": false }],
+    "anonymous": false
+  },
+  {
+    "type": "function",
+    "name": "stake",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      { "name": "side", "type": "bool" },
+      { "name": "amount", "type": "uint256" }
+    ],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "claim",
+    "stateMutability": "nonpayable",
+    "inputs": [],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "getOdds",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [
+      { "name": "yesPercent", "type": "uint256" },
+      { "name": "noPercent", "type": "uint256" }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "getTotalPool",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "uint256" }]
+  },
+  {
+    "type": "function",
+    "name": "getUserStake",
+    "stateMutability": "view",
+    "inputs": [{ "name": "user", "type": "address" }],
+    "outputs": [
+      { "name": "side", "type": "bool" },
+      { "name": "amount", "type": "uint256" }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "resolved",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "bool" }]
+  },
+  {
+    "type": "function",
+    "name": "question",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "string" }]
+  },
+  {
+    "type": "function",
+    "name": "expiryTimestamp",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "uint256" }]
+  }
+]
