@@ -1,9 +1,9 @@
-import { formatUnits, parseUnits, type Abi } from "viem";
 import deployments from "../../shared/deployments.json";
 import factoryAbiJson from "../../shared/abis/MarketFactory.json";
-import oracleRelayerAbiJson from "../../shared/abis/OracleRelayer.json";
 import predictionMarketAbiJson from "../../shared/abis/PredictionMarket.json";
+import oracleRelayerAbiJson from "../../shared/abis/OracleRelayer.json";
 import usdtAbiJson from "../../shared/abis/USDT.json";
+import { formatUnits, parseUnits, type Abi } from "viem";
 
 type DeploymentScope = {
   factory?: string;
@@ -43,9 +43,41 @@ export const FACTORY_ADDRESS =
 
 export const factoryAddress = FACTORY_ADDRESS;
 export const factoryAbi = factoryAbiJson as Abi;
-export const oracleRelayerAbi = oracleRelayerAbiJson as Abi;
 export const predictionMarketAbi = predictionMarketAbiJson as Abi;
+export const oracleRelayerAbi = oracleRelayerAbiJson as Abi;
 export const usdtAbi = usdtAbiJson as Abi;
+
+export const predictionMarketReadAbi = [
+  ...predictionMarketAbi,
+  {
+    type: "function",
+    name: "feePercent",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+] as Abi;
+
+export const stakedEventAbi = {
+  type: "event",
+  name: "Staked",
+  inputs: [
+    { name: "user", type: "address", indexed: true },
+    { name: "side", type: "bool", indexed: false },
+    { name: "amount", type: "uint256", indexed: false },
+  ],
+  anonymous: false,
+} as const;
+
+export const claimedEventAbi = {
+  type: "event",
+  name: "Claimed",
+  inputs: [
+    { name: "user", type: "address", indexed: true },
+    { name: "amount", type: "uint256", indexed: false },
+  ],
+  anonymous: false,
+} as const;
 
 export function parseUSDT(amount: string): bigint {
   return parseUnits(amount, USDT_DECIMALS);
