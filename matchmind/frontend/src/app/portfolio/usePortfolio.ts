@@ -120,7 +120,7 @@ export function usePortfolio() {
 
         if (!cancelled) {
           const flattened = loaded.flat().sort(compareLoadedPositionsNewestFirst);
-          setPositions(flattened.map(({ blockNumber: _blockNumber, logIndex: _logIndex, ...position }) => position));
+          setPositions(flattened.map(({ blockNumber: __blockNumber, _logIndex: _logIndex, ...position }) => position));
         }
       } catch {
         if (!cancelled) {
