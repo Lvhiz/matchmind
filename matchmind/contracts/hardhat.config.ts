@@ -3,10 +3,7 @@ import "@nomicfoundation/hardhat-toolbox";
 import * as dotenv from "dotenv";
 import * as path from "path";
 
-dotenv.config({ path: path.resolve(__dirname, "../.env") });
-
-const XLAYER_MAINNET_RPC =
-  process.env.XLAYER_MAINNET_RPC ?? "https://rpc.xlayer.tech";
+dotenv.config({ path: path.resolve(__dirname, ".env") });
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -19,21 +16,22 @@ const config: HardhatUserConfig = {
     },
   },
   networks: {
-    xlayer: {
-      url: XLAYER_MAINNET_RPC,
+    xlayer_mainnet: {
+      url: process.env.XLAYER_MAINNET_RPC || "https://rpc.xlayer.tech",
       chainId: 196,
-      accounts: process.env.AGENT_PRIVATE_KEY
-        ? [process.env.AGENT_PRIVATE_KEY]
+      accounts: process.env.DEPLOYER_PRIVATE_KEY
+        ? [process.env.DEPLOYER_PRIVATE_KEY]
         : [],
+      gasPrice: "auto",
     },
   },
   etherscan: {
     apiKey: {
-      xlayer: "no-api-key-needed",
+      xlayer_mainnet: "no-api-key-needed",
     },
     customChains: [
       {
-        network: "xlayer",
+        network: "xlayer_mainnet",
         chainId: 196,
         urls: {
           apiURL: "https://www.oklink.com/api/v5/explorer/contract/verify-source-code-plugin/XLayer",

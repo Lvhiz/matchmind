@@ -1,9 +1,11 @@
 {
-  "xlayerMainnet": {
-    "chainId": 196,
-    "factory": "placeholder_until_deployed",
-    "oracleRelayer": "placeholder_until_deployed",
-    "token": "0x74b7F16337b8972027F6196A17a631aC6dE26d22",
-    "usdt": "0x74b7F16337b8972027F6196A17a631aC6dE26d22"
-  }
+  "network": "xlayer_mainnet",
+  "chainId": 196,
+  "oracleRelayer": "0x0f9B56D409AE1777fa4267683a45fE8ae915751d",
+  "marketFactory": "0xE03f0A8CA8a1214cCEE330BAfbC449D56B92DdC8",
+  "usdtToken": "0x74b7F16337b8972027F6196A17a631aC6dE26d22",
+  "deployedAt": "2026-05-27T21:48:38.656Z",
+  "deployer": "0x3a9f57bf23cf86AE15851650E4EB8bC08A8DF13f",
+  "agent": "0x3a9f57bf23cf86AE15851650E4EB8bC08A8DF13f",
+  "feeRecipient": "0x3a9f57bf23cf86AE15851650E4EB8bC08A8DF13f"
 }
