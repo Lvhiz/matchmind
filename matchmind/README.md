@@ -1,42 +1,30 @@
 # MatchMind
 
-AI-powered football prediction oracle on X Layer mainnet.
+AI-powered micro prediction markets for live World Championship football on X Layer mainnet.
 
-## Monorepo structure
+## Live Demo
+https://matchmind-gf9l.vercel.app
 
-| Package     | Description                          |
-| ----------- | ------------------------------------ |
-| `contracts` | Solidity / Hardhat smart contracts   |
-| `agent`     | Node.js AI oracle agent              |
-| `frontend`  | Next.js 14 web app                   |
-| `shared`    | Shared ABIs and TypeScript types     |
-
-## Contract addresses (X Layer mainnet)
+## Contracts (X Layer Mainnet)
 
 | Contract | Address |
 | -------- | ------- |
-| Factory  | _TBD_   |
-| Token    | _TBD_   |
+| MarketFactory | 0xE03f0A8CA8a1214cCEE330BAfbC449D56B92DdC8 |
+| OracleRelayer | 0x0f9B56D409AE1777fa4267683a45fE8ae915751d |
+| USDT | 0x74b7F16337b8972027F6196A17a631aC6dE26d22 |
 
-## Environment
+## Verify on OKLink
+- [MarketFactory](https://www.oklink.com/xlayer/address/0xE03f0A8CA8a1214cCEE330BAfbC449D56B92DdC8)
+- [OracleRelayer](https://www.oklink.com/xlayer/address/0x0f9B56D409AE1777fa4267683a45fE8ae915751d)
 
-Copy `.env.example` to `.env` at the repo root and fill in the values.
+## Monorepo structure
 
-## Getting started
+| Package | Description |
+| ----------- | ---------------------------------- |
+| `contracts` | Solidity / Hardhat smart contracts |
+| `agent` | Node.js AI oracle agent |
+| `frontend` | Next.js 14 web app |
+| `shared` | Shared ABIs and TypeScript types |
 
-```bash
-# Contracts
-cd contracts
-npm install
-npm run compile
-
-# Agent
-cd agent
-npm install
-npm run build
-
-# Frontend
-cd frontend
-npm install
-npm run dev
-```
+## Track
+Prediction Markets + AI Agent on X Layer
