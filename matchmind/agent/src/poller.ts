@@ -1,12 +1,10 @@
-import axios, { AxiosInstance } from "axios";
+// MOCK MODE - hackathon demo only. Replace with real API before production.
 import * as fs from "fs";
 import * as path from "path";
 import cron from "node-cron";
 
-const API_BASE = "https://www.thesportsdb.com/api/v1/json/3/";
 const STATE_PATH = path.resolve(__dirname, "../state.json");
 
-/** Normalised live match state for the agent and frontend API. */
 export type MatchState = {
   fixtureId: number;
   homeTeam: string;
@@ -25,48 +23,40 @@ export type MatchState = {
   lastUpdated: Date;
 };
 
-/** Raw live event from TheSportsDB GET /livescore.php */
-export type TheSportsDbLiveEvent = {
-  idEvent: string;
-  strHomeTeam: string;
-  strAwayTeam: string;
-  intHomeScore: string | null;
-  intAwayScore: string | null;
-  strStatus: string;
-  intElapsed: string | null;
-  strLeague: string;
-};
+type MatchEvent = MatchState["recentEvents"][number];
 
-type LivescoreResponse = {
-  livescore?: TheSportsDbLiveEvent[] | null;
-  events?: TheSportsDbLiveEvent[] | null;
-};
+let state = createInitialState();
+let started = false;
 
-const client: AxiosInstance = axios.create({
-  baseURL: API_BASE,
-  timeout: 30_000,
-});
+export function startPolling(onUpdate: (state: MatchState) => void): void {
+  if (started) {
+    return;
+  }
 
-function parseIntSafe(value: string | null | undefined, fallback = 0): number {
-  if (value === null || value === undefined || value === "") return fallback;
-  const n = parseInt(String(value), 10);
-  return Number.isFinite(n) ? n : fallback;
+  started = true;
+
+  tick(onUpdate);
+
+  cron.schedule("* * * * *", () => {
+    tick(onUpdate);
+  });
 }
 
-/**
- * Map a TheSportsDB live event to {MatchState}.
- */
-export function toMatchState(event: TheSportsDbLiveEvent): MatchState {
+function tick(onUpdate: (state: MatchState) => void): void {
+  state = nextState(state);
+  writeState(state);
+  onUpdate(cloneState(state));
+  console.log(`⚽ [MOCK] minute ${state.elapsed} | ${state.score.home}-${state.score.away}`);
+}
+
+function createInitialState(): MatchState {
   return {
-    fixtureId: parseIntSafe(event.idEvent),
-    homeTeam: event.strHomeTeam ?? "",
-    awayTeam: event.strAwayTeam ?? "",
-    score: {
-      home: parseIntSafe(event.intHomeScore),
-      away: parseIntSafe(event.intAwayScore),
-    },
-    elapsed: parseIntSafe(event.intElapsed),
-    possession: { home: 50, away: 50 },
+    fixtureId: 19620260528,
+    homeTeam: "Brazil",
+    awayTeam: "Argentina",
+    score: { home: 0, away: 0 },
+    elapsed: 0,
+    possession: { home: 52, away: 48 },
     shotsOnTarget: { home: 0, away: 0 },
     xG: { home: 0, away: 0 },
     recentEvents: [],
@@ -74,65 +64,126 @@ export function toMatchState(event: TheSportsDbLiveEvent): MatchState {
   };
 }
 
-/**
- * Fetch all live matches from TheSportsDB.
- * GET /livescore.php
- */
-export async function fetchLiveMatches(): Promise<TheSportsDbLiveEvent[]> {
-  const { data } = await client.get<LivescoreResponse>("/livescore.php");
+function nextState(current: MatchState): MatchState {
+  if (current.elapsed >= 90) {
+    return createInitialState();
+  }
 
-  const rows = data.livescore ?? data.events ?? [];
-  return Array.isArray(rows) ? rows : [];
+  const elapsed = current.elapsed + 1;
+  const homePossession = randomInt(45, 65);
+  const next: MatchState = {
+    ...current,
+    elapsed,
+    possession: {
+      home: homePossession,
+      away: 100 - homePossession,
+    },
+    score: { ...current.score },
+    shotsOnTarget: { ...current.shotsOnTarget },
+    xG: {
+      home: round2(current.xG.home + randomFloat(0.01, 0.05)),
+      away: round2(current.xG.away + randomFloat(0.01, 0.05)),
+    },
+    recentEvents: [...current.recentEvents],
+    lastUpdated: new Date(),
+  };
+
+  maybeAddEvent(next);
+  next.recentEvents = next.recentEvents.slice(-12);
+
+  return next;
 }
 
-function writeState(matches: MatchState[]): void {
+function maybeAddEvent(match: MatchState): void {
+  const roll = Math.random();
+
+  if (roll < 0.05) {
+    addGoal(match);
+    return;
+  }
+
+  if (roll < 0.08) {
+    addYellowCard(match);
+    return;
+  }
+
+  if (roll < 0.16) {
+    addShotOnTarget(match);
+  }
+}
+
+function addGoal(match: MatchState): void {
+  const team = pickTeam(match);
+  const side = team === match.homeTeam ? "home" : "away";
+
+  match.score[side] += 1;
+  match.xG[side] = round2(match.xG[side] + 0.15);
+  match.recentEvents.push({
+    type: "goal",
+    team,
+    minute: match.elapsed,
+    detail: `${team} scores after sustained pressure`,
+  });
+}
+
+function addYellowCard(match: MatchState): void {
+  const team = pickTeam(match);
+
+  match.recentEvents.push({
+    type: "yellow_card",
+    team,
+    minute: match.elapsed,
+    detail: `${team} player booked for a late challenge`,
+  });
+}
+
+function addShotOnTarget(match: MatchState): void {
+  const team = pickTeam(match);
+  const side = team === match.homeTeam ? "home" : "away";
+
+  match.shotsOnTarget[side] += 1;
+  match.xG[side] = round2(match.xG[side] + randomFloat(0.04, 0.12));
+  match.recentEvents.push({
+    type: "shot_on_target",
+    team,
+    minute: match.elapsed,
+    detail: `${team} forces a save with a shot on target`,
+  });
+}
+
+function pickTeam(match: MatchState): string {
+  return Math.random() < match.possession.home / 100 ? match.homeTeam : match.awayTeam;
+}
+
+function writeState(match: MatchState): void {
   const payload = {
-    matches: matches.map((m) => ({
-      ...m,
-      lastUpdated: m.lastUpdated.toISOString(),
-    })),
-    updatedAt: new Date().toISOString(),
+    ...match,
+    lastUpdated: match.lastUpdated.toISOString(),
   };
 
   fs.writeFileSync(STATE_PATH, JSON.stringify(payload, null, 2), "utf8");
 }
 
-/**
- * Poll TheSportsDB every 60 seconds for live matches.
- * Never throws — errors are logged and the next cycle runs on schedule.
- */
-export function startPolling(onUpdate: (state: MatchState) => void): void {
-  const run = async () => {
-    const ts = new Date().toISOString();
-    try {
-      const live = await fetchLiveMatches();
-      console.log(`⚽ Polling... [${ts}] — ${live.length} live matches`);
-
-      const states: MatchState[] = [];
-      for (const event of live) {
-        try {
-          const state = toMatchState(event);
-          states.push(state);
-          onUpdate(state);
-        } catch (err) {
-          console.error(
-            `[poller] Event ${event.idEvent} update failed:`,
-            err
-          );
-        }
-      }
-
-      writeState(states);
-    } catch (err) {
-      console.error(`[poller] Poll cycle failed [${ts}]:`, err);
-    }
+function cloneState(match: MatchState): MatchState {
+  return {
+    ...match,
+    score: { ...match.score },
+    possession: { ...match.possession },
+    shotsOnTarget: { ...match.shotsOnTarget },
+    xG: { ...match.xG },
+    recentEvents: match.recentEvents.map((event: MatchEvent) => ({ ...event })),
+    lastUpdated: new Date(match.lastUpdated),
   };
+}
 
-  run().catch((err) => console.error("[poller] Initial poll failed:", err));
+function randomInt(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
-  cron.schedule("* * * * *", () => {
-    run().catch((err) => console.error("[poller] Scheduled poll failed:", err));
-  });
+function randomFloat(min: number, max: number): number {
+  return Math.random() * (max - min) + min;
+}
 
-  console.log("[poller] Started — polling TheSportsDB live matches every 60s");
+function round2(value: number): number {
+  return Math.round(value * 100) / 100;
 }

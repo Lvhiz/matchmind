@@ -87,8 +87,7 @@ function runStartupChecks(): void {
   }
 
   if (!process.env.ANTHROPIC_API_KEY) {
-    logger.error("[startup] ANTHROPIC_API_KEY is not set");
-    hasFailure = true;
+    logger.warn("[startup] ANTHROPIC_API_KEY is not set — using fallback market generator");
   }
 
   if (!process.env.XLAYER_MAINNET_RPC) {
